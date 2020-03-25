@@ -30,7 +30,7 @@ print("Beginning excavation with arguments:")
 print("Width: " .. width)
 print("Height: " .. height)
 print("Depth: " .. depth)
-print("EnableChest: " .. enableChest)
+print("EnableChest: " .. tostring(enableChest))
 if enableChest then
     robotUtils.ExcavateWithChest(width, height, depth)
 else

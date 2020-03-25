@@ -110,8 +110,8 @@ function robotUtils.ExcavateWithChest(width, height, depth)
 end
 function robotUtils.MoveLateral(x, y)
     robot.turnRight()
-    for i = 1, x+1 do robotUtils.MoveWithRetry(robot.forward) end
+    for i = 1, x do robotUtils.MoveWithRetry(robot.forward) end
     robot.turnLeft()
-    for i = 1, y+1 do robotUtils.MoveWithRetry(robot.forward) end
+    for i = 1, y do robotUtils.MoveWithRetry(robot.forward) end
 end
 return robotUtils
