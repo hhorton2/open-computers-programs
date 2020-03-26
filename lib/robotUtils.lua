@@ -1,8 +1,19 @@
 local robot = require("robot")
 local sides = require("sides")
 local robotUtils = {}
-function robotUtils.MoveWithRetry(move)
-    while not move() do robotUtils.RemoveIfPresent(sides.front) end
+function robotUtils.MoveWithRetry(move, stepCount)
+    stepCount = stepCount or 1
+    for i = 1, stepCount do
+        while not move() do
+            if move == robot.forward then
+                robotUtils.RemoveIfPresent(sides.front)
+            elseif move == robot.up then
+                robotUtils.RemoveIfPresent(sides.top)
+            elseif move == robot.down then
+                robotUtils.RemoveIfPresent(sides.bottom)
+            end
+        end
+    end
 end
 function robotUtils.RemoveIfPresent(side)
     if side == sides.front then
@@ -44,63 +55,48 @@ function robotUtils.DropAllInventory()
         if count > 0 then robot.drop(count) end
     end
 end
-function robotUtils.Excavate(width, height, depth)
+function robotUtils.Excavate(width, height, depth, widthStepAmount,
+                             heightStepAmount, withChest)
+    widthStepAmount = widthStepAmount or 1
+    heightStepAmount = heightStepAmount or 1
+    withChest = withChest or false
+    local heightMax = height // heightStepAmount
+    local widthMax = width // widthStepAmount
     for i = 1, depth do
-        for j = 1, width do
-            for k = 1, height do
+        for j = 1, widthMax do
+            for k = 1, heightMax do
                 robotUtils.RemoveIfPresent(sides.front)
-                if k ~= height then
-                    robotUtils.MoveWithRetry(robot.up)
+                if k ~= heightMax then
+                    robotUtils.MoveWithRetry(robot.up, heightStepAmount)
                 end
             end
-            for k = 1, height - 1 do
-                robotUtils.MoveWithRetry(robot.down)
+            for k = 1, heightMax - 1 do
+                robotUtils.MoveWithRetry(robot.down, heightStepAmount)
             end
-            if j ~= width then
-                robot.turnRight()
-                robotUtils.MoveWithRetry(robot.forward)
-                robot.turnLeft()
-            end
-        end
-        robot.turnLeft()
-        for j = 1, width - 1 do robotUtils.MoveWithRetry(robot.forward) end
-        robot.turnRight()
-        robotUtils.MoveWithRetry(robot.forward)
-    end
-    robot.turnAround()
-    for i = 1, depth do robotUtils.MoveWithRetry(robot.forward) end
-    robot.turnAround()
-end
-function robotUtils.ExcavateWithChest(width, height, depth)
-    for i = 1, depth do
-        for j = 1, width do
-            for k = 1, height do
-                robotUtils.RemoveIfPresent(sides.front)
-                if k ~= height then
-                    robotUtils.MoveWithRetry(robot.up)
-                end
-            end
-            for k = 1, height - 1 do
-                robotUtils.MoveWithRetry(robot.down)
-            end
-            if not robotUtils.IsInventorySlotAvailable() then
-                robot.turnAround()
-                robotUtils.MoveLateral(j-1, i-1)
-                robotUtils.DropAllInventory()
+            if withChest then
                 if not robotUtils.IsInventorySlotAvailable() then
-                    do return end
+                    robot.turnAround()
+                    robotUtils.MoveLateral(
+                        j * widthStepAmount - widthStepAmount, i - 1)
+                    robotUtils.DropAllInventory()
+                    if not robotUtils.IsInventorySlotAvailable() then
+                        do return end
+                    end
+                    robot.turnAround()
+                    robotUtils.MoveLateral(
+                        j * widthStepAmount - widthStepAmount, i - 1)
                 end
-                robot.turnAround()
-                robotUtils.MoveLateral(j-1,i-1)
             end
-            if j ~= width then
+            if j ~= widthMax then
                 robot.turnRight()
-                robotUtils.MoveWithRetry(robot.forward)
+                robotUtils.MoveWithRetry(robot.forward, widthStepAmount)
                 robot.turnLeft()
             end
         end
         robot.turnLeft()
-        for j = 1, width - 1 do robotUtils.MoveWithRetry(robot.forward) end
+        for j = 1, widthMax - 1 do
+            robotUtils.MoveWithRetry(robot.forward, widthStepAmount)
+        end
         robot.turnRight()
         robotUtils.MoveWithRetry(robot.forward)
     end
