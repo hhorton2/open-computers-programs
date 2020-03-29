@@ -11,6 +11,8 @@ function robotUtils.MoveWithRetry(move, stepCount)
                 robotUtils.RemoveIfPresent(sides.top)
             elseif move == robot.down then
                 robotUtils.RemoveIfPresent(sides.bottom)
+            elseif move == robot.back then
+                robotUtils.RemoveIfPresent(sides.back)
             end
         end
     end
@@ -60,8 +62,8 @@ function robotUtils.Excavate(width, height, depth, widthStepAmount,
     widthStepAmount = widthStepAmount or 1
     heightStepAmount = heightStepAmount or 1
     withChest = withChest or false
-    local heightMax = height // heightStepAmount
-    local widthMax = width // widthStepAmount
+    local heightMax = height / heightStepAmount
+    local widthMax = width / widthStepAmount
     for i = 1, depth do
         for j = 1, widthMax do
             for k = 1, heightMax do
@@ -76,15 +78,17 @@ function robotUtils.Excavate(width, height, depth, widthStepAmount,
             if withChest then
                 if not robotUtils.IsInventorySlotAvailable() then
                     robot.turnAround()
-                    robotUtils.MoveLateral(
-                        j * widthStepAmount - widthStepAmount, i - 1)
+                    robot.select(1)
+                    while not robot.place() do
+                        robotUtils.RemoveIfPresent(sides.front)
+                    end
                     robotUtils.DropAllInventory()
                     if not robotUtils.IsInventorySlotAvailable() then
                         do return end
                     end
+                    robot.select(1)
+                    robotUtils.RemoveIfPresent(sides.front)
                     robot.turnAround()
-                    robotUtils.MoveLateral(
-                        j * widthStepAmount - widthStepAmount, i - 1)
                 end
             end
             if j ~= widthMax then
