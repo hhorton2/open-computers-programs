@@ -27,8 +27,7 @@ repeat
                         cobbleCount = cobbleCount + 1
                     end
                 elseif string.match(slotName, "Ore") and
-                    not string.match(slotName, "Cinnabar") and
-                    not string.match(slotName, "Nickel") then
+                    not string.match(slotName, "Cinnabar") then
                     succesString = " to processing."
                     moveCount = transposer.transferItem(sides.west, sides.down,
                                                         sourceStackSize, i)

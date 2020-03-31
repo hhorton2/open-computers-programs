@@ -2,21 +2,17 @@ local robotUtils = require("robotUtils")
 local component = require("component")
 
 local args = {...}
-if #args < 6 then
+if #args < 3 then
     print(
-        "Excavate requires 6 arguments - Width, Height, Depth, WidthMove, HeightMove and EnableChest.")
-    do return end
-end
-if args[6] == nil then
-    print("EnableChest is a required argument.")
+        "Excavate requires at least arguments. In order arguments are - Width, Height, Depth, WidthMove, HeightMove and EnableChest.")
     do return end
 end
 local width = tonumber(args[1])
 local height = tonumber(args[2])
 local depth = tonumber(args[3])
-local widthMove = tonumber(args[4])
-local heightMove = tonumber(args[5])
-local enableChest = string.lower(args[6]) == "true"
+local widthMove = tonumber(args[4] or "1")
+local heightMove = tonumber(args[5] or "1")
+local enableChest = string.lower(args[6] or "false") == "true"
 if width == nil or width < 1 then
     print("Width must be a positive integer")
     do return end
