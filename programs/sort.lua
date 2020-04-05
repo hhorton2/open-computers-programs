@@ -3,7 +3,6 @@ local transposer = component.transposer
 local transposerUtils = require("transposerUtils")
 local sides = require("sides")
 local event = require("event")
-local cobbleCount = 0
 repeat
     if not transposerUtils.IsInventoryClear(sides.west) then
         for i = 1, transposer.getInventorySize(sides.west) do
@@ -12,20 +11,15 @@ repeat
                 local slotName = transposer.getStackInSlot(sides.west, i).label
                 local moveCount = 0
                 local succesString = ""
-                if string.match(slotName, "Cobblestone") then
-                    if cobbleCount == 20 then
-                        succesString = " to storage."
-                        moveCount = transposer.transferItem(sides.west,
-                                                            sides.north,
-                                                            sourceStackSize, i)
-                        cobbleCount = 0
-                    else
-                        succesString = " to nullifier."
-                        moveCount = transposer.transferItem(sides.west,
-                                                            sides.south,
-                                                            sourceStackSize, i)
-                        cobbleCount = cobbleCount + 1
-                    end
+                if string.match(slotName, "Cobblestone") or
+                    string.match(slotName, "Andesite") or
+                    string.match(slotName, "Diorite") or
+                    string.match(slotName, "Gravel") or
+                    string.match(slotName, "Granite") or
+                    string.match(slotName, "Dirt") then
+                    succesString = " to nullifier."
+                    moveCount = transposer.transferItem(sides.west, sides.south,
+                                                        sourceStackSize, i)
                 elseif string.match(slotName, "Ore") and
                     not string.match(slotName, "Cinnabar") then
                     succesString = " to processing."
